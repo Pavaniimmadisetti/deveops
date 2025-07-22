@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Scientific Calculator</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    max-width: 350px;
+    margin: 40px auto;
+    border: 2px solid #333;
+    padding: 15px;
+    border-radius: 10px;
+    background: #f0f0f0;
+  }
+  #display {
+    width: 100%;
+    height: 40px;
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    padding: 5px 10px;
+    text-align: right;
+  }
+  button {
+    width: 22%;
+    height: 45px;
+    margin: 1% 1%;
+    font-size: 1.1rem;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+  }
+  button.operator {
+    background-color: #ff9500;
+    color: white;
+  }
+  button.function {
+    background-color: #5a5a5a;
+    color: white;
+  }
+  button.number {
+    background-color: #d4d4d2;
+  }
+  button:active {
+    background-color: #999;
+  }
+</style>
+</head>
+<body>
+
+<h2>Scientific Calculator</h2>
+<input type="text" id="display" readonly />
+
+<div>
+  <!-- Number Buttons -->
+  <button class="number" onclick="appendValue('7')">7</button>
+  <button class="number" onclick="appendValue('8')">8</button>
+  <button class="number" onclick="appendValue('9')">9</button>
+  <button class="operator" onclick="appendValue('/')">÷</button>
+  
+  <button class="number" onclick="appendValue('4')">4</button>
+  <button class="number" onclick="appendValue('5')">5</button>
+  <button class="number" onclick="appendValue('6')">6</button>
+  <button class="operator" onclick="appendValue('*')">×</button>
+  
+  <button class="number" onclick="appendValue('1')">1</button>
+  <button class="number" onclick="appendValue('2')">2</button>
+  <button class="number" onclick="appendValue('3')">3</button>
+  <button class="operator" onclick="appendValue('-')">−</button>
+  
+  <button class="number" onclick="appendValue('0')">0</button>
+  <button class="number" onclick="appendValue('.')">.</button>
+  <button class="operator" onclick="clearDisplay()">C</button>
+  <button class="operator" onclick="appendValue('+')">+</button>
+
+  <!-- Scientific functions -->
+  <button class="function" onclick="applyFunction('sin')">sin</button>
+  <button class="function" onclick="applyFunction('cos')">cos</button>
+  <button class="function" onclick="applyFunction('tan')">tan</button>
+  <button class="function" onclick="applyFunction('log')">log</button>
+  
+  <button class="function" onclick="applyFunction('sqrt')">√</button>
+  <button class="function" onclick="applyFunction('pow')">xʸ</button>
+  <button class="function" onclick="applyFunction('fact')">n!</button>
+  <button class="function" onclick="calculate()">=</button>
+</div>
+
+<script>
+  const display = document.getElementById('display');
+
+  // Append number/operator to display
+  function appendValue(val) {
+    display.value += val;
+  }
+
+  // Clear display
+  function clearDisplay() {
+    display.value = '';
+  }
+
+  // Calculate factorial
+  function factorial(n) {
+    if (n < 0) return NaN;
+    if (n === 0 || n === 1) return 1;
+    let fact = 1;
+    for(let i = 2; i <= n; i++) fact *= i;
+    return fact;
+  }
+
+  // Apply scientific functions
+  function applyFunction(fn) {
+    try {
+      let val = display.value;
+      if (val === '') return;
+
+      switch(fn) {
+        case 'sin':
+          display.value = Math.sin(toRadians(parseFloat(val))).toFixed(8);
+          break;
+        case 'cos':
+          display.value = Math.cos(toRadians(parseFloat(val))).toFixed(8);
+          break;
+        case 'tan':
+          display.value = Math.tan(toRadians(parseFloat(val))).toFixed(8);
+          break;
+        case 'log':
+          if (parseFloat(val) <= 0) {
+            display.value = 'Error';
+          } else {
+            display.value = Math.log10(parseFloat(val)).toFixed(8);
+          }
+          break;
+        case 'sqrt':
+          if (parseFloat(val) < 0) {
+            display.value = 'Error';
+          } else {
+            display.value = Math.sqrt(parseFloat(val)).toFixed(8);
+          }
+          break;
+        case 'fact':
+          const n = parseInt(val);
+          if (isNaN(n) || n < 0) {
+            display.value = 'Error';
+          } else {
+            display.value = factorial(n);
+          }
+          break;
+        case 'pow':
+          // Wait for user to input power, e.g., 2* to power 3
+          display.value += '**';
+          break;
+      }
+    } catch(e) {
+      display.value = 'Error';
+    }
+  }
+
+  // Convert degrees to radians
+  function toRadians(deg) {
+    return deg * (Math.PI / 180);
+  }
+
+  // Calculate expression in display
+  function calculate() {
+    try {
+      // Evaluate expression — allow ** for power
+      // Sanitize input to avoid security issues if extending this code
+      let expr = display.value.replace(/[^-()\d/*+.e**]/g, '');
+
+      // Evaluate the expression safely
+      let result = Function('"use strict";return (' + expr + ')')();
+      display.value = Number.isFinite(result) ? result : 'Error';
+    } catch (e) {
+      display.value = 'Error';
+    }
+  }
+</script>
+
+</body>
+</html>
